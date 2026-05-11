@@ -6,7 +6,6 @@ Run with:
     locust -f tests/performance/locustfile.py --host=https://staging.example.com
     locust -f tests/performance/locustfile.py --host=https://staging.example.com --headless -u 50 -r 5 --run-time 5m
 """
-import json
 import random
 from locust import HttpUser, TaskSet, task, between, events
 from locust.exception import RescheduleTask
@@ -114,7 +113,7 @@ def on_test_stop(environment, **kwargs):
     """Log test completion and check thresholds."""
     stats = environment.stats.total
 
-    print(f"\n📊 Performance Test Results:")
+    print("\n📊 Performance Test Results:")
     print(f"   Total requests: {stats.num_requests}")
     print(f"   Failures: {stats.num_failures}")
     print(f"   Avg response time: {stats.avg_response_time:.0f}ms")
