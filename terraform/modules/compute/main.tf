@@ -58,8 +58,8 @@ resource "aws_instance" "selenium_node" {
   }
 
   user_data = base64encode(templatefile("${path.module}/templates/selenium-node-init.sh", {
-    environment  = var.environment
-    hub_host     = aws_instance.selenium_hub[0].private_ip
+    environment = var.environment
+    hub_host    = aws_instance.selenium_hub[0].private_ip
   }))
 
   tags = {
