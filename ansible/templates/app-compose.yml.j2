@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  app:
+    image: "{{ app_image | default('nginx:latest') }}"
+    container_name: app-under-test
+    ports:
+      - "{{ app_port }}:80"
+    environment:
+      - APP_ENV={{ environment }}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

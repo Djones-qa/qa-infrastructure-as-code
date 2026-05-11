@@ -24,6 +24,10 @@ env:
   PYTHON_VERSION: "3.11"
   TARGET_ENV: ${{ github.event.inputs.environment || 'staging' }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   full-regression:
     name: Full Regression (${{ matrix.browser }})
