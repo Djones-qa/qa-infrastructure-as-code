@@ -1,5 +1,11 @@
 # QA Infrastructure as Code
 
+[![CI Pipeline](https://github.com/Djones-qa/qa-infrastructure-as-code/actions/workflows/ci.yml/badge.svg)](https://github.com/Djones-qa/qa-infrastructure-as-code/actions/workflows/ci.yml)
+[![Nightly Regression](https://github.com/Djones-qa/qa-infrastructure-as-code/actions/workflows/nightly.yml/badge.svg)](https://github.com/Djones-qa/qa-infrastructure-as-code/actions/workflows/nightly.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Terraform](https://img.shields.io/badge/Terraform-1.5%2B-7B42BC?logo=terraform)](https://developer.hashicorp.com/terraform)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
+
 A production-ready QA infrastructure framework using modern DevOps tooling to provision, configure, and manage automated testing environments at scale.
 
 ## 🏗️ Architecture Overview
