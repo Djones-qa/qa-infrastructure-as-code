@@ -1,0 +1,54 @@
+---
+- name: Deploy application under test
+  hosts: test_runner
+  become: true
+  gather_facts: true
+
+  vars:
+    app_dir: /opt/app-under-test
+    app_port: 8080
+
+  tasks:
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Copy application docker-compose
+      ansible.builtin.template:
+        src: ../templates/app-compose.yml.j2
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Deploy application
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: always
+
+    - name: Wait for application to be healthy
+      ansible.builtin.uri:
+        url: "http://localhost:{{ app_port }}/health"
+        method: GET
+        status_code: 200
+      register: app_health
+      until: app_health.status == 200
+      retries: 20
+      delay: 10
+
+    - name: Run smoke tests
+      ansible.builtin.command:
+        cmd: pytest tests/smoke/ -v --tb=short
+        chdir: /opt/qa-tests
+      register: smoke_results
+      changed_when: false
+      failed_when: smoke_results.rc != 0
+
+    - name: Display smoke test results
+      ansible.builtin.debug:
+        msg: "{{ smoke_results.stdout_lines }}"

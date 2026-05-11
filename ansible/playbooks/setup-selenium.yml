@@ -1,0 +1,94 @@
+---
+- name: Deploy Selenium Grid Hub
+  hosts: selenium_hub
+  become: true
+  gather_facts: true
+
+  vars:
+    selenium_version: "4.18.1"
+    selenium_dir: /opt/selenium-grid
+    selenium_hub_port: 4444
+
+  tasks:
+    - name: Create Selenium Grid directory
+      ansible.builtin.file:
+        path: "{{ selenium_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Deploy Selenium Hub docker-compose
+      ansible.builtin.template:
+        src: ../templates/selenium-hub-compose.yml.j2
+        dest: "{{ selenium_dir }}/docker-compose.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Pull Selenium Hub image
+      community.docker.docker_image:
+        name: "selenium/hub:{{ selenium_version }}"
+        source: pull
+
+    - name: Start Selenium Hub
+      community.docker.docker_compose_v2:
+        project_src: "{{ selenium_dir }}"
+        state: present
+
+    - name: Wait for Selenium Hub to be ready
+      ansible.builtin.uri:
+        url: "http://localhost:{{ selenium_hub_port }}/wd/hub/status"
+        method: GET
+        status_code: 200
+      register: hub_status
+      until: hub_status.status == 200
+      retries: 30
+      delay: 5
+
+    - name: Display Hub status
+      ansible.builtin.debug:
+        msg: "Selenium Hub is ready at http://{{ ansible_host }}:{{ selenium_hub_port }}"
+
+- name: Deploy Selenium Grid Nodes
+  hosts: selenium_nodes
+  become: true
+  gather_facts: true
+
+  vars:
+    selenium_version: "4.18.1"
+    selenium_dir: /opt/selenium-nodes
+
+  tasks:
+    - name: Create Selenium Nodes directory
+      ansible.builtin.file:
+        path: "{{ selenium_dir }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Deploy Selenium Nodes docker-compose
+      ansible.builtin.template:
+        src: ../templates/selenium-nodes-compose.yml.j2
+        dest: "{{ selenium_dir }}/docker-compose.yml"
+        owner: ubuntu
+        group: ubuntu
+        mode: "0644"
+
+    - name: Pull Selenium Node images
+      community.docker.docker_image:
+        name: "{{ item }}"
+        source: pull
+      loop:
+        - "selenium/node-chrome:{{ selenium_version }}"
+        - "selenium/node-firefox:{{ selenium_version }}"
+
+    - name: Start Selenium Nodes
+      community.docker.docker_compose_v2:
+        project_src: "{{ selenium_dir }}"
+        state: present
+
+    - name: Display Node status
+      ansible.builtin.debug:
+        msg: "Selenium Nodes started on {{ ansible_host }}, connecting to hub at {{ hostvars[groups['selenium_hub'][0]]['ansible_host'] }}"

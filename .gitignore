@@ -1,0 +1,75 @@
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+.terraform.lock.hcl
+*.tfvars
+!terraform/environments/*/terraform.tfvars  # Allow example tfvars (no secrets)
+terraform/tfplan
+terraform/infrastructure-outputs.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Test reports
+reports/
+allure-results/
+allure-report/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# SSH keys
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ansible
+ansible/*.retry
+ansible/roles/*/files/*.pem
+ansible/group_vars/*/vault.yml
+
+# Docker
+docker/test-runner/reports/
+
+# Logs
+*.log
+logs/
